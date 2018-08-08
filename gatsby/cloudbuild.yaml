@@ -1,0 +1,77 @@
+# In this directory, run the following command to build this builder.
+# $ gcloud builds submit . --config=cloudbuild.yaml
+#
+# TODO(franklinn): Stop tagging nodejs/yarn images once usage has dropped off.
+
+steps:
+# Build all supported versions.
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=6.14.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-6.14.0'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=8.11.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-8.11.0'
+  # 8.11.0 is tagged :latest
+  - '--tag=gcr.io/$PROJECT_ID/yarn:latest'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=8.4.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-8.4.0'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=9.10.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-9.10.0'
+  - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg=NODE_VERSION=v10.3.0'
+  - '--tag=gcr.io/$PROJECT_ID/yarn:node-10.3.0'
+  # 10.3.0 is tagged :current
+  - '--tag=gcr.io/$PROJECT_ID/yarn:current'
+  - '--tag=gcr.io/$PROJECT_ID/nodejs/yarn'
+  - '.'
+
+# Print for each version
+- name: 'gcr.io/$PROJECT_ID/yarn:node-6.14.0'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-8.11.0'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-8.4.0'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-9.10.0'
+  args: ['--version']
+- name: 'gcr.io/$PROJECT_ID/yarn:node-10.3.0'
+  args: ['--version']
+
+# Test the examples with :latest
+
+# hello_world
+- name: 'gcr.io/$PROJECT_ID/yarn:latest'
+  args: ['install']
+  dir: 'examples/hello_world'
+- name: 'gcr.io/$PROJECT_ID/yarn:latest'
+  args: ['test']
+  dir: 'examples/hello_world'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '.']
+  dir: 'examples/hello_world'
+
+images:
+- 'gcr.io/$PROJECT_ID/yarn:latest'
+- 'gcr.io/$PROJECT_ID/yarn:current'
+- 'gcr.io/$PROJECT_ID/yarn:node-6.14.0'
+- 'gcr.io/$PROJECT_ID/yarn:node-8.11.0'
+- 'gcr.io/$PROJECT_ID/yarn:node-8.4.0'
+- 'gcr.io/$PROJECT_ID/yarn:node-9.10.0'
+- 'gcr.io/$PROJECT_ID/yarn:node-10.3.0'
+- 'gcr.io/$PROJECT_ID/nodejs/yarn'
