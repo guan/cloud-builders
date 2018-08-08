@@ -1,4 +1,4 @@
 FROM node:latest
-RUN yarn global add gatsby-cli
+RUN npm install -g gatsby-cli
 
 ENTRYPOINT ["gatsby"]
